@@ -25,7 +25,10 @@
 
 ---
 #### 3자리 난수 생성 로직
-
+UBlueprintFunctionLibrary를 상속 받은 UNumBaseballBPFuncLib 클래스의 정적 함수
+TArray<int32> UNumBaseballBPFuncLib::RandomNumberGenerator()
+가 난수 생성 로직을 담당한다.
+0으로 시작하지 않고 0~9를 포함하는 3자리 숫자를 생성해 반환한다.
 ---
 #### 판정 로직
 
