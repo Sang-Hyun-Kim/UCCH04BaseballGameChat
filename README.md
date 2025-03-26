@@ -123,9 +123,9 @@ ScoreCheck 함수를 통해 인자로 받은 정답과 플레이어의 답안을
 먼저 ProcessNumAnswer 함수 BP 내에서는 턴 및 입력 검증 후 옳바른 경우에 결과 검사 수행을, 아닌 경우에는 안내 메세지를 BroadCast 이벤트로 넘긴다.
 
 ![Image](https://github.com/user-attachments/assets/99a800f3-216a-4547-a24d-c79fd6f60c1d)
-
-![Image](https://github.com/user-attachments/assets/05ab0ecd-dae1-4f21-a983-94a3dd84c7b9)
 ![Image](https://github.com/user-attachments/assets/8df25d47-39b8-454f-bcf4-b50ef2fdecbd)
+![Image](https://github.com/user-attachments/assets/05ab0ecd-dae1-4f21-a983-94a3dd84c7b9)
+
 
 ![Image](https://github.com/user-attachments/assets/9c12e2d2-c464-4d82-bac9-d4a285a7f48c)
 ![Image](https://github.com/user-attachments/assets/5827c546-77be-4fbd-8b67-c85473df1ae5)
