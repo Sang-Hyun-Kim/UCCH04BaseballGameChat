@@ -122,7 +122,7 @@ TArray<int32> UNumBaseballBPFuncLib::ScoreCheck(const TArray<int32>& Answer, int
 ScoreCheck 함수를 통해 인자로 받은 정답과 플레이어의 답안을 비교, Strikes, Balls, Outs의 갯수를 담은 배열을 반환하면, GameMode는 해당 반환을 사용한다.
 
 ![Image](https://github.com/user-attachments/assets/9c12e2d2-c464-4d82-bac9-d4a285a7f48c)
-![Image](https://github.com/user-attachments/assets/35202f4c-9b44-4fed-beab-1481a41d77ab)
+![Image](https://github.com/user-attachments/assets/5827c546-77be-4fbd-8b67-c85473df1ae5)
 
 ---
 #### 시도 횟수 및 상태 관리
