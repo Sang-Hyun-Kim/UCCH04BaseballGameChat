@@ -26,7 +26,7 @@
 ---
 #### 3자리 난수 생성 로직
 
-난수 생성 로직은 BlueprintFunctionLibrary 을 상속받은 UNumBaseballBPFuncLib 클래스에서 수행한다. 
+난수 생성 로직은 BlueprintFunctionLibrary 을 상속받은 UNumBaseballBPFuncLib 클래스에서 수행한다.  
 
 ```C++
 // 
@@ -128,7 +128,7 @@ ScoreCheck 함수를 통해 인자로 받은 정답과 플레이어의 답안을
 ![Image](https://github.com/user-attachments/assets/8df25d47-39b8-454f-bcf4-b50ef2fdecbd)
 ![Image](https://github.com/user-attachments/assets/5827c546-77be-4fbd-8b67-c85473df1ae5)
 
-반환된 배열은 ResultCheck BP 함수 노드를 통해 
+반환된 배열을 이용하는 ResultCheck BP 함수 노드는 결과 메세지를 BroadCast 하도록 생성 및 반환하고 승리시 IsFinished 배열의 값을 True로 변환한다. 이는 승리 및 시도 체크에 사용된다.
 
 ---
 #### 시도 횟수 및 상태 관리
