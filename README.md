@@ -26,6 +26,8 @@
 ---
 #### 3자리 난수 생성 로직
 
+난수 생성 로직은 BlueprintFunctionLibrary 을 상속받은 UNumBaseballBPFuncLib 클래스에서 수행한다. 
+
 ```C++
 // 
 #pragma once
@@ -80,6 +82,7 @@ TArray<int32> UNumBaseballBPFuncLib::RandomNumberGenerator()
 ---
 #### 판정 로직
 
+판정 로직은 BlueprintFunctionLibrary 을 상속받은 UNumBaseballBPFuncLib 클래스에서  static TArray<int32> ScoreCheck(const TArray<int32>& Answer,int32 Guess) 함수를 통해 이루어진 반환값을 GameMode BP의 이벤트 그래프에서 로직통해 결과 출력, 승리 및 무승부 여부를 판단한다.
 
 ```C++
 // 
@@ -115,8 +118,8 @@ TArray<int32> UNumBaseballBPFuncLib::ScoreCheck(const TArray<int32>& Answer, int
 	Result.Add(Outs);
 	return Result;
 }
-
 ```
+ ScoreCheck 함수를 통한 
 ---
 #### 시도 횟수 및 상태 관리
 
