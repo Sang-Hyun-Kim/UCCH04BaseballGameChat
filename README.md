@@ -82,7 +82,7 @@ TArray<int32> UNumBaseballBPFuncLib::RandomNumberGenerator()
 ---
 #### 판정 로직
 
-판정 로직은 BlueprintFunctionLibrary 을 상속받은 UNumBaseballBPFuncLib 클래스에서  static TArray<int32> ScoreCheck(const TArray<int32>& Answer,int32 Guess) 함수를 통해 이루어진 반환값을 GameMode BP의 이벤트 그래프에서 로직통해 결과 출력, 승리 및 무승부 여부를 판단한다.
+판정 로직은 BlueprintFunctionLibrary 을 상속받은 UNumBaseballBPFuncLib 클래스에서  static TArray<int32> ScoreCheck(const TArray<int32>& Answer,int32 Guess) 함수를 통해 이루어진 반환값을 GameMode BP의 이벤트 그래프 내의 ProcessNumAnswer 함수 BP 안에서 로직통해 결과 출력, 승리 및 무승부 여부를 판단한다.
 
 ```C++
 // 
@@ -120,9 +120,17 @@ TArray<int32> UNumBaseballBPFuncLib::ScoreCheck(const TArray<int32>& Answer, int
 }
 ```
 ScoreCheck 함수를 통해 인자로 받은 정답과 플레이어의 답안을 비교, Strikes, Balls, Outs의 갯수를 담은 배열을 반환하면, GameMode는 해당 반환을 사용한다.
+먼저 ProcessNumAnswer 함수 BP 내에서는 턴 및 입력 검증 후 옳바른 경우에 결과 검사 수행을, 아닌 경우에는 안내 메세지를 BroadCast 이벤트로 넘긴다.
+
+![Image](https://github.com/user-attachments/assets/99a800f3-216a-4547-a24d-c79fd6f60c1d)
+
+![Image](https://github.com/user-attachments/assets/05ab0ecd-dae1-4f21-a983-94a3dd84c7b9)
+![Image](https://github.com/user-attachments/assets/8df25d47-39b8-454f-bcf4-b50ef2fdecbd)
 
 ![Image](https://github.com/user-attachments/assets/9c12e2d2-c464-4d82-bac9-d4a285a7f48c)
 ![Image](https://github.com/user-attachments/assets/5827c546-77be-4fbd-8b67-c85473df1ae5)
+
+반환된 배열은 ResultCheck BP 함수 노드를 통해 
 
 ---
 #### 시도 횟수 및 상태 관리
