@@ -119,7 +119,9 @@ TArray<int32> UNumBaseballBPFuncLib::ScoreCheck(const TArray<int32>& Answer, int
 	return Result;
 }
 ```
- ScoreCheck 함수를 통한 
+ScoreCheck 함수를 통해 인자로 받은 정답과 플레이어의 답안을 비교, Strikes, Balls, Outs의 갯수를 담은 배열을 반환하면, GameMode는 해당 반환을 사용한다.
+
+
 ---
 #### 시도 횟수 및 상태 관리
 
