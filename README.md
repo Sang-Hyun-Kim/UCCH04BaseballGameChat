@@ -133,8 +133,122 @@ ScoreCheck 함수를 통해 인자로 받은 정답과 플레이어의 답안을
 ---
 #### 시도 횟수 및 상태 관리
 
+플레이어의 시도 횟수 및 상태 관리는 GameStateBase 클래스를 상속받은 AMyGameStateBase 에서 담당한다.
+
+```C++
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/GameStateBase.h"
+#include "MyGameStateBase.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class SAMPLECHAT_API AMyGameStateBase : public AGameStateBase
+{
+	GENERATED_BODY()
+	
+public:
+	AMyGameStateBase();
+
+	UPROPERTY(Replicated,BlueprintReadWrite)
+	int32 HostPlayerScore;
+
+
+	UPROPERTY(Replicated,BlueprintReadWrite)
+	int32 GuestPlayerScore;
+
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 HostAttemps;
+
+
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 GuestAttemps;
+
+	/** 점수를 설정하는 서버 전용 함수 */
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_SetHostScore(int32 NewScore);
+
+	UFUNCTION(Server, Reliable,BlueprintCallable)
+	void Server_SetGuestScore(int32 NewScore);
+
+	/** 횟수 변경 */
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_SetHostAttemps(int32 NewAttemps);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void Server_SetGuestAttemps(int32 NewAttemps);
+
+protected:
+	/** Replicated 변수 동기화 함수 */
+	UFUNCTION()
+	void OnRep_HostPlayerScore();
+
+	UFUNCTION()
+	void OnRep_GuestPlayerScore();
+
+	/** 네트워크 복제를 위한 함수 */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+};
+```
+```C++
+void AMyGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMyGameStateBase, HostPlayerScore);
+	DOREPLIFETIME(AMyGameStateBase, GuestPlayerScore);
+	DOREPLIFETIME(AMyGameStateBase, HostAttemps);
+	DOREPLIFETIME(AMyGameStateBase, GuestAttemps);
+}
+```
+각 플레이어의 시도 횟수와 점수를 관리하는 AMyGameStateBase 내에서 추가 확장을 위해 OnRep_ 함수들과 _Impletation 함수들을 같이 구현 해놓은 다음 시도와 점수 변화가 생길 때 GameMode에서 해당 함수를 호출시키는 방식으로 구현하였다.
+각 레플리케이트 될 변수들을 레플레키이션 시스템에 등록한 다음 서버에서 값을 조작하면 각 Client로 반영되도록 구현하였다.
+이를 이용해, GameMode에서는 UpdateAttempts, CheckAttempts 라는 BP 함수를 구현해 사용한다.
+먼저 플레이어의 턴의 답안 제출 후 정답이 아니라면 UpdateAttemps 함수를 통해 답안을 제출한 플레이어의 시도 횟수를 업데이트하고 이후 CheckAttempts 함수가 양 플레이어의 시도 횟수가 최대 시도 횟수(현재 3회)에 도달한 경우 무승부 안내 메세지를 전송하고 게임을 초기화하는 작업을 시작한다.
+![Image](https://github.com/user-attachments/assets/fec6ab34-4d80-4b61-bebc-d6baf34a88de)
+![Image](https://github.com/user-attachments/assets/7d6def65-7c3f-4bf8-b5d8-1cc145dbd5c8)
+![Image](https://github.com/user-attachments/assets/a95db7f8-b975-427f-882a-baea4179d56d)
+
 ---
 #### 승리 무승부 게임 리셋
+- 승리
+-- 승리 시(IsFinished 변수가 참인 경우)시 맞춘 플레이어의 점수를 올린다. 정답을 맞췄다는 안내 메시지와, 현재 각 플레이어의 점수를 BroadCast 하여 각 클라이언트에게 콘솔출력되도록 구현했다.
+-- 그 후 게임 초기화 작업이 시작된다.
+
+```C++
+// 점수 업데이트를 서버에서만 실행하도록 설정
+void AMyGameStateBase::Server_SetHostScore_Implementation(int32 NewScore)
+{
+	HostPlayerScore = NewScore;
+}
+
+void AMyGameStateBase::Server_SetGuestScore_Implementation(int32 NewScore)
+{
+	GuestPlayerScore = NewScore;
+}
+void AMyGameStateBase::Server_SetHostAttemps_Implementation(int32 NewAttemps)
+{
+	HostAttemps = NewAttemps;
+}
+
+void AMyGameStateBase::Server_SetGuestAttemps_Implementation(int32 NewAttemps)
+{
+	GuestAttemps = NewAttemps;
+}  
+```
+![Image](https://github.com/user-attachments/assets/c26286de-5058-4b09-bd6c-fc90e156703f)
+
+- 무승부
+-- 무승부 시 게임 초기화 작업시 시작된다.
+
+- 게임 초기화
+-- 게임 승리 및 무승부 시 초기화 작업은 다음과 같다
 
 ---
 #### 턴 제어 기능
