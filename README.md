@@ -218,8 +218,8 @@ void AMyGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutL
 ---
 #### 승리 무승부 게임 리셋
 - 승리
--- 승리 시(IsFinished 변수가 참인 경우)시 맞춘 플레이어의 점수를 올린다. 정답을 맞췄다는 안내 메시지와, 현재 각 플레이어의 점수를 BroadCast 하여 각 클라이언트에게 콘솔출력되도록 구현했다.
--- 그 후 게임 초기화 작업이 시작된다.
+	- 승리 시(IsFinished 변수가 참인 경우)시 맞춘 플레이어의 점수를 올린다. 정답을 맞췄다는 안내 메시지와, 현재 각 플레이어의 점수를 BroadCast 하여 각 클라이언트에게 콘솔출력되도록 구현했다.
+	- 그 후 게임 초기화 작업이 시작된다.
 
 ```C++
 // 점수 업데이트를 서버에서만 실행하도록 설정
@@ -245,13 +245,34 @@ void AMyGameStateBase::Server_SetGuestAttemps_Implementation(int32 NewAttemps)
 ![Image](https://github.com/user-attachments/assets/c26286de-5058-4b09-bd6c-fc90e156703f)
 
 - 무승부
--- 무승부 시 게임 초기화 작업시 시작된다.
+	- 무승부 시 게임 초기화 작업시 시작된다.
 
 - 게임 초기화
--- 게임 승리 및 무승부 시 초기화 작업은 다음과 같다
+	- 게임 승리 및 무승부 시 초기화 작업은 다음과 같다
+		- 호스트의 턴으로 변경
+  		- IsFinished 변수 false
+    		- 새로운 숫자 야구 답안 생성
+      		- 승리 또는 무승부 관련 안내 출력
+        	- 승리의 경우 현재 양 플레이어의 점수를 출력
+         	- 턴 시스템의 제한시간을 초기화
+          	- ClearAttempts BP 함수 구현, 해당 함수는 각 플레이어의 시도 횟수 0으로 초기화
+
+![Image](https://github.com/user-attachments/assets/e52f9e02-bee5-49bc-8836-756ddbe3a864)
+
+![Image](https://github.com/user-attachments/assets/504a7203-5b40-4bf3-ab8f-28524c4d12a9)
+
+![Image](https://github.com/user-attachments/assets/ea2287ad-efe7-4d46-af00-e45f60358e3c)
 
 ---
 #### 턴 제어 기능
+- 턴 시스템은, 턴 제한시간(TurnTime float 변수, 최대 8초)안에 답안 채팅이 서버로 전달되지 않는다면 다른플레이어의 턴으로 전환되는 로직을 구현하였다.
+- 게임 초기화시 시작되는 InitTurnTimer와 OnTurnEnd BP 함수를 GameMode 내에서 구현했고 이를 사용했다.
+- InitTurnTimer 함수 BP는 OnTurnEnd 함수를 제한시간이 지나면 호출하도록 TimerHandle안에 저장하는 SetTimerbyFunctionName BP 노드 실행하고 안내 메세지를 BroadCast하는 방식이다.
+![Image](https://github.com/user-attachments/assets/f2994b6f-ec2a-4ed2-b538-1541b5623fb9)
+- OnTurnEnd 함수는 제한 시간 도달 또는 입력 시 실행되는 함수 이며, 턴 전환시 실행되는 함수다. 다시 OnTurnEnd 함수를 타이머에 등록하는 것이 특징이다.
+![Image](https://github.com/user-attachments/assets/4d982827-698a-43cd-9e60-8ec5eeeb67b0)
+
+![Image](https://github.com/user-attachments/assets/da3135e4-cb63-4440-ac1a-8bae2b084599)
 
 ---
 
