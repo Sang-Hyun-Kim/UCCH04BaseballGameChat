@@ -18,11 +18,28 @@
   - 시도 횟수 및 상태 관리
   - 승리 무승부 게임 리셋
 - 도전 기능
-  - 턴 제어 기능
-  - 타이머 기능
+  - 턴 제어 기능과 타이머 기능
 ---  
 #### GameMode 서버 로직
-
+- 게임 채팅이 서버로 보내진 다음 다시 돌아오는 방식은 다음과 같다
+	- 플레이어가 Text 입력 UI에 채팅 또는 답안을 제출하면 이는 이벤트 디스패처를 통해 PlayerController에 바인딩된 이벤트를 실행한다.
+ 	-  바인딩된 이벤트는 GameMode의 GotMEssageFromClient 이벤트를 다시 실행한다.
+  	-  GotMEssageFromClient 이벤트는 이후 일반 채팅과 정답을 구분해서 플로우가 진행된다
+  		- 일반 채팅은  PlayerController의 GotBroadCast 이벤트를 실행, 각 OwningClient의 콘솔 출력이 되도록 수행
+  	 	- 답안 제출은  답안 입력 검증, 답안 결과 계산 및 출력, 승리 또는 무승부 처리, 게임 초기화 순으로 이루진다.
+	- 답안 검증은 ProcessNumAnswer함수를 통해 정규식 구현을 위해 구현된 UMyStringRegexValidator BPFunctionLibrary 코드 내에서 검증 후 처리된다. 그후 옳은 시도였는지를 반환한다.
+ 	- 결과 계산은 ResultCheck BP 함수를 통해  Strikes,Balls,Outs의 개수를 BroadCast를 통해 출력하고, 해당 결과가 남긴 String 배열을 반환한다.
+* UI 위젯 이벤트 그래프
+![Image](https://github.com/user-attachments/assets/0c6c58c9-bc44-479a-b1c0-7f12d6d81314)
+* Controller 이벤트 그래프
+![Image](https://github.com/user-attachments/assets/7581c5a2-33d2-4a7c-8779-d32967173932)
+* GameModeBase의 이벤트 그래프
+![Image](https://github.com/user-attachments/assets/7ea75135-d3da-4626-a062-2ef90e9905c6)
+* GameModeBase의 이벤트 그래프(일반 채팅 BroadCast 전달)
+![Image](https://github.com/user-attachments/assets/8dc71499-c416-4ccc-adf6-14c5b186211b)
+* Controller 이벤트 그래프
+![Image](https://github.com/user-attachments/assets/f980ab52-f823-406a-a293-ad36822d237c)
+    
 ---
 #### 3자리 난수 생성 로직
 
@@ -264,22 +281,22 @@ void AMyGameStateBase::Server_SetGuestAttemps_Implementation(int32 NewAttemps)
 ![Image](https://github.com/user-attachments/assets/ea2287ad-efe7-4d46-af00-e45f60358e3c)
 
 ---
-#### 턴 제어 기능
-- 턴 시스템은, 턴 제한시간(TurnTime float 변수, 최대 8초)안에 답안 채팅이 서버로 전달되지 않는다면 다른플레이어의 턴으로 전환되는 로직을 구현하였다.
+#### 턴 제어 기능과 타이머 기능
+- 턴 시스템은, 턴 제한시간(TurnTime float 변수, 최대 8초)안에 답안 채팅이 서버로 전달되지 않거나, 플레이어가 입력 후 정답이 아니라면 다른플레이어의 턴으로 전환되는 로직을 구현하였다.
 - 게임 초기화시 시작되는 InitTurnTimer와 OnTurnEnd BP 함수를 GameMode 내에서 구현했고 이를 사용했다.
 - InitTurnTimer 함수 BP는 OnTurnEnd 함수를 제한시간이 지나면 호출하도록 TimerHandle안에 저장하는 SetTimerbyFunctionName BP 노드 실행하고 안내 메세지를 BroadCast하는 방식이다.
 ![Image](https://github.com/user-attachments/assets/f2994b6f-ec2a-4ed2-b538-1541b5623fb9)
 - OnTurnEnd 함수는 제한 시간 도달 또는 입력 시 실행되는 함수 이며, 턴 전환시 실행되는 함수다. 다시 OnTurnEnd 함수를 타이머에 등록하는 것이 특징이다.
 ![Image](https://github.com/user-attachments/assets/4d982827-698a-43cd-9e60-8ec5eeeb67b0)
+- 플레이어 입력을 처리하는 GameMode의 BP 함수 ProcessNumAnswer 함수의 내부에서 OnTurnEnd 함수 호출을 통해 입력 후에도 타이머 갱신 및 턴 전환 수행되는 모습이다.
+![Image](https://github.com/user-attachments/assets/a138fa19-9b53-4d39-93f9-acf7800b8601)
 
 ![Image](https://github.com/user-attachments/assets/da3135e4-cb63-4440-ac1a-8bae2b084599)
 
 ---
-
-#### 타이머 기능
-
----
 ### 시연 영상 테스트
+
+
 
 ---
 ### 평가 체크 리스트
