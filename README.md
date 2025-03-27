@@ -335,7 +335,7 @@ bool UMyStringRegexValidator::ValidateBaseballInput(const FString& InputString)
 ---
 ### 시연 영상 테스트
 
-
+[![Video Label](http://img.youtube.com/vi/5-QbzTMfBf4/0.jpg)](https://youtu.be/5-QbzTMfBf4)
 
 ---
 ### 평가 체크 리스트
