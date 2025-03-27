@@ -9,6 +9,7 @@
 
 ### 개요
 해당 레포지토리는 내일배움캠프 언리얼 2기의 리슨 서버 과제 제출 및 설명을 것입니다.
+
 ---
 ### 주요 구현 기능
 - 필수 기능
@@ -19,6 +20,8 @@
   - 승리 무승부 게임 리셋
 - 도전 기능
   - 턴 제어 기능과 타이머 기능
+- 추가 기능
+	- 정규식 입력 검증 
 ---  
 #### GameMode 서버 로직
 - 게임 채팅이 서버로 보내진 다음 다시 돌아오는 방식은 다음과 같다
@@ -293,6 +296,42 @@ void AMyGameStateBase::Server_SetGuestAttemps_Implementation(int32 NewAttemps)
 
 ![Image](https://github.com/user-attachments/assets/da3135e4-cb63-4440-ac1a-8bae2b084599)
 
+
+#### 정규식 입력 검증
+- 답안 입력은 /뒤에 붙은 숫자 3자리만 허용하도록 정규식을 활용해보려했다.
+- 정규식 자체는 Unreal 에서는 제공하지 않지만 C++ std::regex 라이브러리를 활용하면 된다.
+- 따라서 BlueprintFunctionLibrary를 상속받는 정규식 검즐 클래스의 정적 함수 구현으로 활용하는 방식을 사용하였다.
+- GameMode내의 ProcessNumAnswer 함수는 이때 나온 검증 결과를 저장 후 반환한다.
+```C++
+// header
+UCLASS()
+class SAMPLECHAT_API UMyStringRegexValidator : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+	
+public:
+	UFUNCTION(BlueprintCallable, Category = "MyString Regex Valid")
+	static bool ValidateBaseballInput(const FString& InputString);
+};
+// cpp
+#include "MyStringRegexValidator.h"
+#include <regex>
+
+bool UMyStringRegexValidator::ValidateBaseballInput(const FString& InputString)
+{
+    // FString → std::string 변환
+    std::string StdString = TCHAR_TO_UTF8(*InputString);
+    std::regex Pattern(R"(^\/\d{3}$)");
+
+    return std::regex_match(StdString, Pattern);
+}
+
+```
+![Image](https://github.com/user-attachments/assets/04a01fa7-7f97-4fa9-8aad-7ae160228c54)
+
+![Image](https://github.com/user-attachments/assets/e06f355a-6305-44bf-8f89-bf5e16d4cccb)
+
+
 ---
 ### 시연 영상 테스트
 
@@ -317,3 +356,7 @@ void AMyGameStateBase::Server_SetGuestAttemps_Implementation(int32 NewAttemps)
 |TArray 사용에 따른 최적화 고민|이해도(도전)|🟢|
 |Readme 작성을 통한 과제 소개|우수성(필수)|🟢|
 |타이머 구현|우수성(도전)|🟢|
+
+### 회고
+- 캠프 강의 기반으로 시작하는 과제다 보니 BP 프로젝트가 주어진 점을 활용해 BP위주로 제작해보았는데(정규식 입력 검증과 난수 생성 및 정답 검증 처럼 추가 기능 제외) 너무 불편했다 처음 부터 C++로 새로 만들걸 그랬다.
+- 입력이 틀리거나 턴에 맞지 제출하지 못한 플레이어 에게만 출력하고 싶었는데 그렇지 못하고 BroadCast를 사용하였다.
